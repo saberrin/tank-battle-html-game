@@ -319,11 +319,11 @@
       <section class="panel">
         <h2>Touch</h2>
         <div class="touch" aria-label="Touch controls">
-          <button class="up" data-control="up" aria-label="Move up">↑</button>
-          <button class="left" data-control="left" aria-label="Move left">←</button>
-          <button class="fire" data-control="fire" aria-label="Fire">●</button>
-          <button class="right" data-control="right" aria-label="Move right">→</button>
-          <button class="down" data-control="down" aria-label="Move down">↓</button>
+          <button class="up" data-control="up" aria-label="Move up">&uarr;</button>
+          <button class="left" data-control="left" aria-label="Move left">&larr;</button>
+          <button class="fire" data-control="fire" aria-label="Fire">&bull;</button>
+          <button class="right" data-control="right" aria-label="Move right">&rarr;</button>
+          <button class="down" data-control="down" aria-label="Move down">&darr;</button>
         </div>
       </section>
       <section class="panel">
@@ -477,6 +477,22 @@
       running = true;
       paused = false;
       hideOverlay();
+      updateHud();
+    }
+
+    function prepareIntro() {
+      makeMap();
+      bullets = [];
+      sparks = [];
+      tanks = [];
+      baseAlive = true;
+      player = createTank("player", 12 * TILE + 1, 24 * TILE + 1);
+      tanks.push(player);
+      spawned = 0;
+      enemiesToSpawn = 10 + level * 2;
+      running = false;
+      paused = false;
+      gameOver = false;
       updateHud();
     }
 
@@ -785,6 +801,7 @@
     }
 
     function draw() {
+      if (map.length !== GRID) return;
       ctx.clearRect(0, 0, SIZE, SIZE);
       ctx.fillStyle = "#111216";
       ctx.fillRect(0, 0, SIZE, SIZE);
@@ -883,8 +900,8 @@
     pauseBtn.addEventListener("click", togglePause);
     restartBtn.addEventListener("click", resetGame);
 
+    prepareIntro();
     showOverlay("Ready", "Defend the base, break brick walls, and clear all enemy tanks.", "Start Battle");
-    updateHud();
     requestAnimationFrame(loop);
   </script>
 </body>
