@@ -351,6 +351,7 @@
     const GRID = 26;
     const SIZE = TILE * GRID;
     const TANK = 22;
+    const PLAYER_START = { x: 12 * TILE + 1, y: 22 * TILE + 1 };
     const dirs = {
       up: { x: 0, y: -1, angle: -Math.PI / 2 },
       right: { x: 1, y: 0, angle: 0 },
@@ -384,6 +385,7 @@
     let running = false;
     let paused = false;
     let gameOver = false;
+    let levelCleared = false;
     let lastTime = 0;
     let baseAlive = true;
 
@@ -469,10 +471,11 @@
       tanks = [];
       baseAlive = true;
       gameOver = false;
+      levelCleared = false;
       spawned = 0;
       enemiesToSpawn = 10 + level * 2;
       spawnTimer = 0;
-      player = createTank("player", 12 * TILE + 1, 24 * TILE + 1);
+      player = createTank("player", PLAYER_START.x, PLAYER_START.y);
       tanks.push(player);
       running = true;
       paused = false;
@@ -486,7 +489,8 @@
       sparks = [];
       tanks = [];
       baseAlive = true;
-      player = createTank("player", 12 * TILE + 1, 24 * TILE + 1);
+      levelCleared = false;
+      player = createTank("player", PLAYER_START.x, PLAYER_START.y);
       tanks.push(player);
       spawned = 0;
       enemiesToSpawn = 10 + level * 2;
@@ -637,7 +641,7 @@
           lives--;
           if (lives <= 0) endGame(false, "Your tank squad is out of lives.");
           else {
-            player = createTank("player", 12 * TILE + 1, 24 * TILE + 1);
+            player = createTank("player", PLAYER_START.x, PLAYER_START.y);
             tanks.push(player);
           }
         }
@@ -696,6 +700,7 @@
       running = false;
       paused = false;
       gameOver = true;
+      levelCleared = won;
       updateHud();
       if (won) showOverlay("Level Clear", `Score ${score}. ${reason}`, "Next Level");
       else showOverlay("Game Over", `${reason} Final score: ${score}.`, "Restart");
@@ -720,7 +725,6 @@
 
       const enemiesAlive = tanks.some(t => t.kind === "enemy" && t.alive);
       if (baseAlive && spawned >= enemiesToSpawn && !enemiesAlive) {
-        level++;
         score += 500;
         endGame(true, "All enemies cleared.");
       }
@@ -865,10 +869,11 @@
     }
 
     function handleStart() {
-      if (gameOver && !baseAlive) {
-        resetGame();
-      } else if (gameOver) {
+      if (gameOver && levelCleared) {
+        level++;
         startLevel();
+      } else if (gameOver) {
+        resetGame();
       } else if (!running) {
         resetGame();
       }
